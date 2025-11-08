@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="IO\" />
+    <Folder Include="Domain\" />
+    <Folder Include="Formatting\" />
+  </ItemGroup>
+
 </Project>
