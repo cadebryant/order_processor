@@ -1,4 +1,4 @@
-﻿using LegacyOrderProcessor;
+﻿using OrderProcessor;
 using OrderProcessor.Config;
 using PricingConfig = OrderProcessor.Config.PricingConfig;
 using Parser = OrderProcessor.Parsing.Parser;

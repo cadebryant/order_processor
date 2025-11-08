@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor
+namespace OrderProcessor.Formatting
 {
-    public class Program
+    internal class TableFormatter : IReportFormatter
     {
-        public static void Main(string[] args)
-        {
-
-        }
     }
 }
