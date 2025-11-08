@@ -25,7 +25,7 @@ namespace OrderProcessor.Config
             public const double OtherTaxRate = 0.1;
         }
 
-        public static readonly List<string> FallbackLines =
+        public static readonly List<string> DefaultOrderFallbackLines =
         [
             "1,Ada Lovelace,Food,100.00,2024-07-01,US,NY",
             "2,Grace Hopper,Electronics,250.49,7/4/2024,US,CA",

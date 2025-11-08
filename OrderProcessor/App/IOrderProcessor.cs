@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.IO
+namespace OrderProcessor.App
 {
-    public interface IOrderFileReader
+    public interface IOrderProcessor
     {
-        IEnumerable<string> ReadLines(string filePath);
+
     }
 }

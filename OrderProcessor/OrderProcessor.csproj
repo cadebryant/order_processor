@@ -8,9 +8,4 @@
 	  <StartupObject>OrderProcessor.LegacyProgram</StartupObject>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Domain\" />
-    <Folder Include="Formatting\" />
-  </ItemGroup>
-
 </Project>
