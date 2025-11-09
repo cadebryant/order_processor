@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderProcessor.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,9 @@ namespace OrderProcessor.Formatting
 {
     internal class TableFormatter : IReportFormatter
     {
+        public string FormatReport(OrdersReport reportData)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

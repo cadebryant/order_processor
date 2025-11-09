@@ -9,6 +9,6 @@ namespace OrderProcessor.App
 {
     public interface IOrderProcessor
     {
-        PricingResult ProcessOrder(string orderFilePath);
+        OrdersReport ProcessOrders(string orderFilePath);
     }
 }

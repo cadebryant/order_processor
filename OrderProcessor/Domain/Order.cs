@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderProcessor.Config;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,5 +22,8 @@ namespace OrderProcessor.Domain
         public DateTime Date { get; set; } = date;
         public string Region { get; set; } = region;
         public string State { get; set; } = state;
-    }
+        public double Tax => PricingConfig.GetStateTaxRate(State);
+        public double DiscountOrSurcharge => PricingConfig.GetPriceMultiplier(Type);
+        public string? Note { get; set; }
+}
 }

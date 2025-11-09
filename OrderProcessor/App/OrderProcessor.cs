@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PricingConfig = OrderProcessor.Config.PricingConfig;
 
 namespace OrderProcessor.App
 {
@@ -28,17 +29,28 @@ namespace OrderProcessor.App
         private readonly IReportFormatter _reportFormatter = reportFormatter;
         private readonly ILogger _logger = logger;
 
-        public PricingResult ProcessOrder(string orderFilePath)
+        public OrdersReport ProcessOrders(string orderFilePath)
         {
             try
             {
-                return new PricingResult(0, 0, "Not implemented yet");
+                return new OrdersReport(
+                    [ new Order(new Customer("john", "smith"),
+                    PricingConfig.Types.Electronics,
+                    100.00,
+                    DateTime.Now,
+                    PricingConfig.Region.US,
+                    PricingConfig.State.NY)]);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing order file {OrderFilePath}", orderFilePath);
                 throw;
             }
+        }
+
+        public string PrintOrdersReport(OrdersReport report)
+        {
+            return _reportFormatter.FormatReport(report);
         }
     }
 }
