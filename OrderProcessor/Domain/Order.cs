@@ -24,6 +24,7 @@ namespace OrderProcessor.Domain
         public string State { get; set; } = state;
         public double Tax => PricingConfig.GetStateTaxRate(State);
         public double DiscountOrSurcharge => PricingConfig.GetPriceMultiplier(Type);
+        public double Net => Amount + (Amount * Tax) * DiscountOrSurcharge;
         public string? Note { get; set; }
 }
 }

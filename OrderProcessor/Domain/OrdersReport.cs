@@ -16,7 +16,7 @@ namespace OrderProcessor.Domain
         public IEnumerable<Order> Orders { get; set; }
         public int TotalOrders => Orders.Count();
         public double TotalGross => Orders.Sum(o => o.Amount);
-        public double Revenue => Orders.Sum(o => o.Amount * o.DiscountOrSurcharge * o.Tax);
-        public double AverageNet => TotalOrders == 0 ? Revenue / TotalOrders : 0.0;
+        public double Revenue => Orders.Sum(o => o.Net);
+        public double AverageNet => TotalOrders == 0 ? 0.0 : Revenue / TotalOrders;
     }
 }
