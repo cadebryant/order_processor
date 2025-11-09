@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace OrderProcessor.Domain
 {
-    internal class PricingResult
+    public class PricingResult(double net, double taxRate, string? note)
     {
+        public double Net { get; set; } = net;
+        public double TaxRate { get; set; } = taxRate;
+        public string? Note { get; set; } = note;
     }
 }

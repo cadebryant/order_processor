@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OrderProcessor.Domain
 {
-    internal class PricingEngine
+    public class PricingEngine : IPricingEngine
     {
     }
 }
