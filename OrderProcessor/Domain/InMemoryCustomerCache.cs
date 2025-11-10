@@ -3,14 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OrderProcessor.Domain
 {
-    public class InMemoryCustomerCache : ICustomerCache
+    public class InMemoryCustomerCache(IMemoryCache memoryCache) : ICustomerCache
     {
+        private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+
         public Customer? GetCustomer(string name)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Customer name cannot be null or empty.", nameof(name));
+            }
+
+            if (!_memoryCache.TryGetValue(name, out Customer? customer))
+            {
+                _memoryCache.Set(name, new Customer(name));
+                return null;
+            }
+
+            return customer;
         }
     }
 }

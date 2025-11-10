@@ -42,7 +42,7 @@ namespace OrderProcessor.App
                 {
                     if (order.Date == null)
                         order.Date = _clock.Today();
-                    //var customer = _customerCache.GetCustomer(order.Customer.Name);
+                    var customer = _customerCache.GetCustomer(order.Customer.Name) ?? order.Customer;
                     order.Net = _pricingEngine.CalculateNetPrice(order);
                 }
                 return new OrdersReport(parsedOrders, _pricingEngine);

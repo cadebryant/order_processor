@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OrdProcessor = OrderProcessor.App.OrderProcessor;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace OrderProcessor
 {
@@ -19,7 +20,6 @@ namespace OrderProcessor
     {
         public static void Main(string[] args)
         {
-
             var orderFilePath = args.Length > 0 ? args[0] : "orders.csv";
             var app = BuildApplicationHost(orderFilePath);
 
@@ -32,7 +32,14 @@ namespace OrderProcessor
         private static IHost BuildApplicationHost(string orderFilePath)
         {
             var applicationBuilder = Host.CreateApplicationBuilder();
+
+            // Add logging
             applicationBuilder.Services.AddLogging();
+
+            // Register IMemoryCache
+            applicationBuilder.Services.AddMemoryCache();
+
+            // Register other services
             applicationBuilder.Services.AddScoped<ILineSource>(sp => new FileOrFallbackLineSource(orderFilePath));
             applicationBuilder.Services.AddScoped<IOrderParser, NaiveCsvOrderParser>();
             applicationBuilder.Services.AddScoped<IClock, SystemClock>();
@@ -40,6 +47,7 @@ namespace OrderProcessor
             applicationBuilder.Services.AddScoped<IPricingEngine, PricingEngine>();
             applicationBuilder.Services.AddScoped<ICustomerCache, InMemoryCustomerCache>();
             applicationBuilder.Services.AddScoped<IOrderProcessor, OrdProcessor>();
+
             return applicationBuilder.Build();
         }
     }
