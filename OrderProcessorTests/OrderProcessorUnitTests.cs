@@ -2,12 +2,35 @@
 using OrderProcessor.Config;
 using PricingConfig = OrderProcessor.Config.PricingConfig;
 using OrderProcessor.Parsing;
+using Microsoft.Extensions.Logging;
+using Castle.Core.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Microsoft.Extensions.Logging.Abstractions;
+using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
+using NSubstitute;
+using OrderProcessor.IO;
+using OrderProcessor.Domain;
+using Microsoft.Extensions.Caching.Memory;
+using OrderProcessor.Formatting;
+using OrdProcessor = OrderProcessor.App.OrderProcessor;
 
 namespace OrderProcessorTests
 {
     [TestClass]
     public sealed class OrderProcessorUnitTests
     {
+        private readonly ILogger<PricingEngine> _pricingEngineLogger = NullLogger<PricingEngine>.Instance;
+        private readonly ILogger<NaiveCsvOrderParser> _csvOrderLogger = NullLogger<NaiveCsvOrderParser>.Instance;
+        private readonly ILogger<OrdProcessor> _orderProcesserLogger = NullLogger<OrdProcessor>.Instance;
+        private readonly IOrderParser _parser = Substitute.For<IOrderParser>();
+        private readonly IClock _clock = Substitute.For<IClock>();
+        private readonly ILineSource _lineSource = Substitute.For<ILineSource>();
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _clock.Today().Returns(DateTime.Today);
+        }
         [TestMethod]
         public void PricingConfig_TypeMap_ReturnsOther_IfItemTypeNotFound()
         {
@@ -37,6 +60,80 @@ namespace OrderProcessorTests
                 // Assert
                 Assert.AreEqual(testCase.Value, actualMultiplier, $"Failed for item type: {testCase.Key}");
             }
+        }
+
+        [TestMethod]
+        public void OrderProcessor_ProcessOrders_ParsesAndProcessesOrdersCorrectly()
+        {
+            // Arrange
+            _lineSource.GetLines().Returns(new List<string> { "1,John Doe,Food,100.0,2025-11-10,North,CA" });
+            var pricingEngine = new PricingEngine(_pricingEngineLogger);
+            var customerCache = new InMemoryCustomerCache(new MemoryCache(new MemoryCacheOptions()));
+            var reportFormatter = new TableFormatter();
+            var orderProcessor = new OrdProcessor(
+                pricingEngine, customerCache, _parser, _lineSource, reportFormatter, _orderProcesserLogger);
+
+            _parser.ParseLine(Arg.Any<string>()).Returns(new Order(
+                id: 1,
+                customer: new Customer("John Doe"),
+                type: "Food",
+                amount: 100.0,
+                date: DateTime.Today,
+                region: "US",
+                state: "CA"));
+
+            // Act
+            var ordersReport = orderProcessor.ProcessOrders("test_orders.csv");
+
+            // Assert
+            Assert.IsNotNull(ordersReport);
+            Assert.AreEqual(1, ordersReport.TotalOrders);
+            Assert.AreEqual(100.0, ordersReport.TotalGross);
+        }
+
+        [TestMethod]
+        public void OrderProcessor_PrintOrdersReport_FormatsReportCorrectly()
+        {
+            // Arrange
+            var pricingEngine = new PricingEngine(_pricingEngineLogger);
+            var customerCache = new InMemoryCustomerCache(new MemoryCache(new MemoryCacheOptions()));
+            var reportFormatter = new TableFormatter();
+            var orders = new List<Order>
+            {
+                new Order(1, new Customer("John Doe"), "Food", 100.0, _clock.Today(), "North", "CA")
+            };
+            var ordersReport = new OrdersReport(orders, pricingEngine);
+            var orderProcessor = new OrderProcessor.App.OrderProcessor(
+                pricingEngine, customerCache, _parser, new FileOrFallbackLineSource("test_orders.csv"), reportFormatter, _orderProcesserLogger);
+
+            // Act
+            var report = orderProcessor.PrintOrdersReport(ordersReport);
+
+            // Assert
+            Assert.IsFalse(string.IsNullOrWhiteSpace(report));
+            Assert.Contains("John Doe", report);
+        }
+
+        [TestMethod]
+        public void NaiveCsvOrderParser_ParseLine_ParsesValidLineCorrectly()
+        {
+            // Arrange
+            var parser = new NaiveCsvOrderParser(_csvOrderLogger, _clock);
+            var line = "1,John Doe,Food,100.0,2025-11-10,North,CA";
+            _clock.Today().Returns(new DateTime(2025, 11, 10));
+
+            // Act
+            var order = parser.ParseLine(line);
+
+            // Assert
+            Assert.IsNotNull(order);
+            Assert.AreEqual(1, order.Id);
+            Assert.AreEqual("John Doe", order.Customer.Name);
+            Assert.AreEqual("Food", order.Type);
+            Assert.AreEqual(100.0, order.Amount);
+            Assert.AreEqual(new DateTime(2025, 11, 10), order.Date);
+            Assert.AreEqual("North", order.Region);
+            Assert.AreEqual("CA", order.State);
         }
     }
 }

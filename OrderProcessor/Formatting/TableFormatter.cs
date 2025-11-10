@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OrderProcessor.Formatting
 {
-    internal class TableFormatter : IReportFormatter
+    public class TableFormatter : IReportFormatter
     {
         public string FormatReport(OrdersReport reportData)
         {
