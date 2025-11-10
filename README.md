@@ -1,0 +1,1 @@
+A simple order-processing application, refactored from a legacy application.  I have retained the LegacyProgram.cs file in the project; it is not being used, but I retained it so that the differences between the legacy and refactored app can be seen.
