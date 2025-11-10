@@ -1,4 +1,6 @@
-﻿using OrderProcessor.Domain;
+﻿using Microsoft.Extensions.Logging;
+using OrderProcessor.Domain;
+using OrderProcessor.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace OrderProcessor.Parsing
 {
-    public class NaiveCsvOrderParser : IOrderParser
+    public class NaiveCsvOrderParser(
+        ILogger<NaiveCsvOrderParser> logger,
+        IClock clock) : IOrderParser
     {
+        private readonly ILogger<NaiveCsvOrderParser> _logger = logger;
+        private readonly IClock _clock = clock;
         public Order ParseLine(string l)
         {
             try
@@ -38,7 +44,7 @@ namespace OrderProcessor.Parsing
             }
         }
 
-        private static DateTime ParseDate(string dateString)
+        private DateTime ParseDate(string dateString)
         {
             try
             {
@@ -46,7 +52,11 @@ namespace OrderProcessor.Parsing
                 {
                     return new DateTime(ticks);
                 }
-                return DateTime.Parse(dateString);
+                if (DateTime.TryParse(dateString, out var parsedDate))
+                {
+                    return parsedDate;
+                }
+                return _clock.Today();
             }
             catch (Exception ex)
             {
@@ -55,7 +65,7 @@ namespace OrderProcessor.Parsing
             }
         }
 
-        private string GetItemOrEmpty(string[] parts, int index)
+        private static string GetItemOrEmpty(string[] parts, int index)
         {
             return (parts != null && parts.Length > index) ? parts[index] : string.Empty;
         }

@@ -13,7 +13,6 @@ using PricingConfig = OrderProcessor.Config.PricingConfig;
 namespace OrderProcessor.App
 {
     public class OrderProcessor(
-        IClock clock,
         IPricingEngine pricingEngine,
         ICustomerCache customerCache,
         IOrderParser orderParser,
@@ -21,7 +20,6 @@ namespace OrderProcessor.App
         IReportFormatter reportFormatter,
         ILogger<OrderProcessor> logger) : IOrderProcessor
     {
-        private readonly IClock _clock = clock;
         private readonly IPricingEngine _pricingEngine = pricingEngine;
         private readonly ICustomerCache _customerCache = customerCache;
         private readonly IOrderParser _orderParser = orderParser;
@@ -40,8 +38,6 @@ namespace OrderProcessor.App
 
                 foreach (var order in parsedOrders)
                 {
-                    if (order.Date == null)
-                        order.Date = _clock.Today();
                     var customer = _customerCache.GetCustomer(order.Customer.Name) ?? order.Customer;
                     order.Net = _pricingEngine.CalculateNetPrice(order);
                 }
