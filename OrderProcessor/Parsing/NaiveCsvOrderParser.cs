@@ -19,20 +19,16 @@ namespace OrderProcessor.Parsing
                 }
 
                 var parts = l.Split(',');
-                if (parts == null || parts.Length != 7)
-                {
-                    throw new FormatException("Input line is not in the expected CSV format.");
-                }
+                var customer = new Customer(GetItemOrEmpty(parts, 1));
 
-                var customer = new Customer(parts[1]);
                 return new Order(
-                    id: int.TryParse(parts[0], out var id) ? id : -1,
+                    id: int.TryParse(GetItemOrEmpty(parts, 0), out var id) ? id : -1,
                     customer: customer,
-                    type: parts[2],
-                    amount: double.Parse(parts[3]),
-                    date: ParseDate(parts[4]),
-                    region: parts[5],
-                    state: parts[6]
+                    type: GetItemOrEmpty(parts, 2),
+                    amount: double.TryParse(GetItemOrEmpty(parts, 3), out var amt) ? amt : 0.0,
+                    date: ParseDate(GetItemOrEmpty(parts, 4)),
+                    region: GetItemOrEmpty(parts, 5),
+                    state: GetItemOrEmpty(parts, 6)
                 );
             }
             catch (Exception ex)
@@ -57,6 +53,11 @@ namespace OrderProcessor.Parsing
                 throw new FormatException($"Failed to parse date: {dateString}", ex);
                 throw;
             }
+        }
+
+        private string GetItemOrEmpty(string[] parts, int index)
+        {
+            return (parts != null && parts.Length > index) ? parts[index] : string.Empty;
         }
     }
 }

@@ -20,11 +20,11 @@ namespace OrderProcessor
         public static void Main(string[] args)
         {
 
-            var path = args.Length > 0 ? args[0] : "orders.csv";
-            var app = BuildApplicationHost(path);
+            var orderFilePath = args.Length > 0 ? args[0] : "orders.csv";
+            var app = BuildApplicationHost(orderFilePath);
 
             var orderProcessor = app.Services.GetRequiredService<IOrderProcessor>();
-            var orders = orderProcessor.ProcessOrders(path);
+            var orders = orderProcessor.ProcessOrders(orderFilePath);
             var report = orderProcessor.PrintOrdersReport(orders);
             Console.WriteLine(report);
         }
