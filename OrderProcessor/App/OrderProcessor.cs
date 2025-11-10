@@ -39,7 +39,8 @@ namespace OrderProcessor.App
                     100.00,
                     DateTime.Now,
                     PricingConfig.Region.US,
-                    PricingConfig.State.NY)]);
+                    PricingConfig.State.NY)],
+                    _pricingEngine);
             }
             catch (Exception ex)
             {

@@ -25,7 +25,7 @@ namespace OrderProcessor.Formatting
             return sb.ToString();
         }
 
-        private string PrintHeader()
+        private static string PrintHeader()
         {
             return "ID | Customer | Type | Amount | Date | Region | State | Net | Note";
         }
