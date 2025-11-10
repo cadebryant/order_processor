@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderProcessor.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,20 +9,54 @@ namespace OrderProcessor.Parsing
 {
     public class NaiveCsvOrderParser : IOrderParser
     {
-        public (string id, string customer, string type, string amount, string date, string region, string state) ParseLine(string l)
+        public Order ParseLine(string l)
         {
-            if (string.IsNullOrWhiteSpace(l))
+            try
             {
-                throw new ArgumentException("Input line cannot be null or empty.", nameof(l));
-            }
+                if (string.IsNullOrWhiteSpace(l))
+                {
+                    throw new ArgumentException("Input line cannot be null or empty.", nameof(l));
+                }
 
-            var parts = l.Split(',');
-            if (parts == null || parts.Length != 7)
+                var parts = l.Split(',');
+                if (parts == null || parts.Length != 7)
+                {
+                    throw new FormatException("Input line is not in the expected CSV format.");
+                }
+
+                var customer = new Customer(parts[1]);
+                return new Order(
+                    id: int.TryParse(parts[0], out var id) ? id : -1,
+                    customer: customer,
+                    type: parts[2],
+                    amount: double.Parse(parts[3]),
+                    date: ParseDate(parts[4]),
+                    region: parts[5],
+                    state: parts[6]
+                );
+            }
+            catch (Exception ex)
             {
-                throw new FormatException("Input line is not in the expected CSV format.");
+                throw new FormatException($"Failed to parse line: {l}", ex);
+                throw;
             }
+        }
 
-            return (parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]);
+        private static DateTime ParseDate(string dateString)
+        {
+            try
+            {
+                if (long.TryParse(dateString, out var ticks))
+                {
+                    return new DateTime(ticks);
+                }
+                return DateTime.Parse(dateString);
+            }
+            catch (Exception ex)
+            {
+                throw new FormatException($"Failed to parse date: {dateString}", ex);
+                throw;
+            }
         }
     }
 }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace OrderProcessor.Domain
 {
-    public class Customer(string firstName, string lastName)
+    public class Customer(string name)
     {
-        public Guid Id { get; init; } = Guid.NewGuid();
-        public string FirstName { get; set; } = firstName;
-        public string LastName { get; set; } = lastName;
+        public string Name = name;
     }
 }

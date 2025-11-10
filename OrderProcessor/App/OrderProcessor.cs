@@ -33,14 +33,15 @@ namespace OrderProcessor.App
         {
             try
             {
-                return new OrdersReport(
-                    [ new Order(new Customer("john", "smith"),
-                    PricingConfig.Types.Electronics,
-                    100.00,
-                    DateTime.Now,
-                    PricingConfig.Region.US,
-                    PricingConfig.State.NY)],
-                    _pricingEngine);
+                var orderLines = _lineSource.GetLines();
+                var parsedOrders = orderLines
+                    .Select(_orderParser.ParseLine).Where(order => order != null);
+                foreach (var order in parsedOrders)
+                {
+                    if (order.Date == null)
+                        order.Date = _clock.Today();
+                }
+                return new OrdersReport(parsedOrders, _pricingEngine);
             }
             catch (Exception ex)
             {

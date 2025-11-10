@@ -8,5 +8,6 @@ namespace OrderProcessor.IO
 {
     public interface IClock
     {
+        DateTime Today();
     }
 }

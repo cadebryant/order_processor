@@ -8,23 +8,20 @@ using System.Threading.Tasks;
 namespace OrderProcessor.Domain
 {
     public class Order(
+        int id,
         Customer customer,
         string type,
         double amount,
-        DateTime date,
+        DateTime? date,
         string region,
         string state)
     {
-        public Guid Id { get; init; } = Guid.NewGuid();
+        public int Id { get; init; } = id;
         public Customer Customer { get; set; } = customer;
         public string Type { get; set; } = type;
         public double Amount { get; set; } = amount;
-        public DateTime Date { get; set; } = date;
+        public DateTime? Date { get; set; } = date;
         public string Region { get; set; } = region;
         public string State { get; set; } = state;
-        public double Tax => PricingConfig.GetStateTaxRate(State);
-        public double DiscountOrSurcharge => PricingConfig.GetPriceMultiplier(Type);
-        public double Net => Amount + (Amount * Tax) * DiscountOrSurcharge;
-        public string? Note { get; set; }
-}
+    }
 }

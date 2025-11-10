@@ -9,14 +9,9 @@ using PricingConfig = OrderProcessor.Config.PricingConfig;
 
 namespace OrderProcessor.IO
 {
-    public class FileOrFallbackLineSource : ILineSource
+    public class FileOrFallbackLineSource(string filePath) : ILineSource
     {
-        private readonly string _filePath;
-
-        public FileOrFallbackLineSource(string filePath)
-        {
-            _filePath = filePath;
-        }
+        private readonly string _filePath = filePath;
 
         public IEnumerable<string> GetLines()
         {

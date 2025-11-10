@@ -11,8 +11,11 @@ namespace OrderProcessor.Domain
     {
         public IEnumerable<Order> Orders { get; init; } = orders;
         public int TotalOrders => Orders.Count();
-        public double TotalGross => Orders.Sum(o => pricingEngine.CalculateGrossPrice(o));
-        public double Revenue => Orders.Sum(o => o.Net);
-        public double AverageNet => TotalOrders == 0 ? 0.0 : Revenue / TotalOrders;
+        public double TotalGross => Orders.Sum(pricingEngine.CalculateGrossPrice);
+        public double Revenue => Orders.Sum(pricingEngine.CalculateRevenue);
+        public double AverageNet => 
+            TotalOrders == 0 
+                ? 0.0 
+                : Revenue / TotalOrders;
     }
 }

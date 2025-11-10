@@ -33,7 +33,7 @@ namespace OrderProcessor.Domain
             {
                 return order == null
                     ? throw new ArgumentNullException(nameof(order))
-                    : order.Amount + CalculateTaxAmount(order);
+                    : order.Amount;
             }
             catch (Exception ex)
             {
@@ -82,6 +82,21 @@ namespace OrderProcessor.Domain
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error calculating tax amount for order {OrderId}", order?.Id);
+                throw;
+            }
+        }
+
+        public double CalculateRevenue(Order order)
+        {
+            try
+            {
+                return order == null
+                    ? throw new ArgumentNullException(nameof(order))
+                    : CalculateTotalPrice(order) - order.Amount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calculating revenue for order {OrderId}", order?.Id);
                 throw;
             }
         }

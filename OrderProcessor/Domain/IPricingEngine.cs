@@ -13,5 +13,6 @@ namespace OrderProcessor.Domain
         double CalculateTotalPrice(Order order);
         double CalculateDiscountOrSurcharge(Order order);
         double CalculateTaxAmount(Order order);
+        double CalculateRevenue(Order order);
     }
 }

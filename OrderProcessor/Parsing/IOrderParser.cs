@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrderProcessor.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace OrderProcessor.Parsing
 {
     public interface IOrderParser
     {
-        (string id, string customer, string type, string amount, string date, string region, string state) ParseLine(string l);
+        Order ParseLine(string l);
     }
 }

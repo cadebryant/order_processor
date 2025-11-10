@@ -15,7 +15,7 @@ namespace OrderProcessor.Formatting
             sb.AppendLine(PrintHeader());
             foreach (var order in reportData.Orders)
             {
-                sb.AppendLine($"{order.Id} | {order.Customer.FirstName} {order.Customer.LastName} | {order.Type} | {order.Amount:C} | {order.Date:yyyy-MM-dd} | {order.Region} | {order.State} | {order.Net} | {order.Note}");
+                sb.AppendLine($"{order.Id} | {order.Customer.Name} | {order.Type} | {order.Amount:C} | {order.Date:yyyy-MM-dd} | {order.Region} | {order.State}");
             }
             sb.AppendLine($"Total Orders: {reportData.TotalOrders}");
             sb.AppendLine($"Gross: {reportData.TotalGross}");
