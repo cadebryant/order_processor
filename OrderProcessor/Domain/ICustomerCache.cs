@@ -8,5 +8,6 @@ namespace OrderProcessor.Domain
 {
     public interface ICustomerCache
     {
+        public Customer? GetCustomer(string name);
     }
 }

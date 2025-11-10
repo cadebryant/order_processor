@@ -20,9 +20,9 @@ namespace OrderProcessor.Config
 
         public static class DiscountOrSurcharge
         {
-            public const double FoodTaxRate = 0.05;
-            public const double ElectronicsTaxRate = 0.15;
-            public const double OtherTaxRate = 0.1;
+            public const double FoodTaxRate = 0.9;
+            public const double ElectronicsTaxRate = 1.1;
+            public const double OtherTaxRate = 1.0;
         }
 
         public static class State
@@ -40,7 +40,7 @@ namespace OrderProcessor.Config
 
         public static class TaxRate
         {
-            public const double NYTaxRate = 0.0875;
+            public const double NYTaxRate = 0.08875;
             public const double CATaxRate = 0.0725;
             public const double OtherTaxRate = 0.05;
         }

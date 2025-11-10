@@ -10,9 +10,7 @@ namespace OrderProcessor.Domain
     {
         double CalculateNetPrice(Order order);
         double CalculateGrossPrice(Order order);
-        double CalculateTotalPrice(Order order);
         double CalculateDiscountOrSurcharge(Order order);
-        double CalculateTaxAmount(Order order);
-        double CalculateRevenue(Order order);
+        double CalculateTaxAmount(int id, string state, double amount);
     }
 }

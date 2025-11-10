@@ -35,11 +35,15 @@ namespace OrderProcessor.App
             {
                 var orderLines = _lineSource.GetLines();
                 var parsedOrders = orderLines
-                    .Select(_orderParser.ParseLine).Where(order => order != null);
+                    .Select(_orderParser.ParseLine)
+                    .ToList();
+
                 foreach (var order in parsedOrders)
                 {
                     if (order.Date == null)
                         order.Date = _clock.Today();
+                    //var customer = _customerCache.GetCustomer(order.Customer.Name);
+                    order.Net = _pricingEngine.CalculateNetPrice(order);
                 }
                 return new OrdersReport(parsedOrders, _pricingEngine);
             }

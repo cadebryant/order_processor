@@ -18,7 +18,7 @@ namespace OrderProcessor.Domain
             {
                 return order == null 
                     ? throw new ArgumentNullException(nameof(order)) 
-                    : order.Amount * PricingConfig.GetPriceMultiplier(order.Type);
+                    : PricingConfig.GetPriceMultiplier(order.Type);
             }
             catch (Exception ex)
             {
@@ -45,9 +45,11 @@ namespace OrderProcessor.Domain
         public double CalculateNetPrice(Order order)
         {
             try
-            {   return order == null 
-                    ? throw new ArgumentNullException(nameof(order)) 
-                    : order.Amount + CalculateDiscountOrSurcharge(order);
+            {
+                return order == null
+                    ? throw new ArgumentNullException(nameof(order))
+                    : (order.Amount * CalculateDiscountOrSurcharge(order)) 
+                        + CalculateTaxAmount(order.Id, order.State, order.Amount * CalculateDiscountOrSurcharge(order));
             }
             catch (Exception ex)
             {
@@ -56,47 +58,15 @@ namespace OrderProcessor.Domain
             }
         }
 
-        public double CalculateTotalPrice(Order order)
+        public double CalculateTaxAmount(int id, string state, double amount)
         {
             try
             {
-                return order == null
-                    ? throw new ArgumentNullException(nameof(order))
-                    : CalculateNetPrice(order) + CalculateTaxAmount(order);
+                return amount * PricingConfig.GetStateTaxRate(state);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error calculating total price for order {OrderId}", order?.Id);
-                throw;
-            }
-        }
-
-        public double CalculateTaxAmount(Order order)
-        {
-            try
-            {
-                return order == null
-                    ? throw new ArgumentNullException(nameof(order))
-                    : order.Amount * PricingConfig.GetStateTaxRate(order.State);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating tax amount for order {OrderId}", order?.Id);
-                throw;
-            }
-        }
-
-        public double CalculateRevenue(Order order)
-        {
-            try
-            {
-                return order == null
-                    ? throw new ArgumentNullException(nameof(order))
-                    : CalculateTotalPrice(order) - order.Amount;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating revenue for order {OrderId}", order?.Id);
+                _logger.LogError(ex, "Error calculating tax amount for order {id}", id);
                 throw;
             }
         }

@@ -1,6 +1,7 @@
 ﻿using OrderProcessor.Domain;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +16,12 @@ namespace OrderProcessor.Formatting
             sb.AppendLine(PrintHeader());
             foreach (var order in reportData.Orders)
             {
-                sb.AppendLine($"{order.Id} | {order.Customer.Name} | {order.Type} | {order.Amount:C} | {order.Date:yyyy-MM-dd} | {order.Region} | {order.State}");
+                sb.AppendLine($"{order.Id} | {order.Customer.Name} | {order.Type} | {order.Amount.ToString("0.00", CultureInfo.InvariantCulture)} | {order.Date:yyyy-MM-dd} | {order.Region} | {order.State} | {order.Net.ToString("0.00", CultureInfo.InvariantCulture)} | {order.Note}");
             }
             sb.AppendLine($"Total Orders: {reportData.TotalOrders}");
-            sb.AppendLine($"Gross: {reportData.TotalGross}");
-            sb.AppendLine($"Revenue: {reportData.Revenue}");
-            sb.AppendLine($"Avg Net/Order: {reportData.AverageNet}");
+            sb.AppendLine($"Gross: {reportData.TotalGross.ToString("0.00", CultureInfo.InvariantCulture)}");
+            sb.AppendLine($"Revenue: {reportData.Revenue.ToString("0.00", CultureInfo.InvariantCulture)}");
+            sb.AppendLine($"Avg Net/Order: {reportData.AverageNet.ToString("0.00", CultureInfo.InvariantCulture)}");
 
             return sb.ToString();
         }

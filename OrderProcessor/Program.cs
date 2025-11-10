@@ -25,8 +25,7 @@ namespace OrderProcessor
 
             var orderProcessor = app.Services.GetRequiredService<IOrderProcessor>();
             var orders = orderProcessor.ProcessOrders(path);
-            var reportFormatter = app.Services.GetRequiredService<IReportFormatter>();
-            var report = reportFormatter.FormatReport(orders);
+            var report = orderProcessor.PrintOrdersReport(orders);
             Console.WriteLine(report);
         }
 
