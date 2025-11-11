@@ -19,10 +19,8 @@ namespace OrderProcessor.Parsing
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(l))
-                {
+                if (!IsValidCsvLine(l))
                     throw new ArgumentException("Input line cannot be null or empty.", nameof(l));
-                }
 
                 var parts = l.Split(',');
                 var customer = new Customer(GetItemOrEmpty(parts, 1));
@@ -39,7 +37,7 @@ namespace OrderProcessor.Parsing
             }
             catch (Exception ex)
             {
-                throw new FormatException($"Failed to parse line: {l}", ex);
+                _logger.LogError(ex, "Error parsing line: {Line}", l);
                 throw;
             }
         }
@@ -68,6 +66,12 @@ namespace OrderProcessor.Parsing
         private static string GetItemOrEmpty(string[] parts, int index)
         {
             return (parts != null && parts.Length > index) ? parts[index] : string.Empty;
+        }
+
+        private static bool IsValidCsvLine(string line)
+        {
+            return !string.IsNullOrWhiteSpace(line) &&
+                   (line.Contains(',') || line.Split(',').Length == 1);
         }
     }
 }

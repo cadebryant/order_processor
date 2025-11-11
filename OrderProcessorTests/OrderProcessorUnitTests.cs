@@ -135,5 +135,17 @@ namespace OrderProcessorTests
             Assert.AreEqual("North", order.Region);
             Assert.AreEqual("CA", order.State);
         }
+
+        [TestMethod]
+        public void NaiveCsvOrderParser_ParseLine_FailsOnInvalidLine()
+        {
+            // Arrange
+            var parser = new NaiveCsvOrderParser(_csvOrderLogger, _clock);
+            var line = "";
+            _clock.Today().Returns(new DateTime(2025, 11, 10));
+
+            // Act & Assert
+            Assert.Throws<Exception>(() => parser.ParseLine(line));
+        }
     }
 }

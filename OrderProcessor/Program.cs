@@ -20,13 +20,20 @@ namespace OrderProcessor
     {
         public static void Main(string[] args)
         {
-            var orderFilePath = args.Length > 0 ? args[0] : "orders.csv";
-            var app = BuildApplicationHost(orderFilePath);
+            try
+            {
+                var orderFilePath = args.Length > 0 ? args[0] : "orders.csv";
+                var app = BuildApplicationHost(orderFilePath);
 
-            var orderProcessor = app.Services.GetRequiredService<IOrderProcessor>();
-            var orders = orderProcessor.ProcessOrders(orderFilePath);
-            var report = orderProcessor.PrintOrdersReport(orders);
-            Console.WriteLine(report);
+                var orderProcessor = app.Services.GetRequiredService<IOrderProcessor>();
+                var orders = orderProcessor.ProcessOrders(orderFilePath);
+                var report = orderProcessor.PrintOrdersReport(orders);
+                Console.WriteLine(report);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            }
         }
 
         private static IHost BuildApplicationHost(string orderFilePath)
