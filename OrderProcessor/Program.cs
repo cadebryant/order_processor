@@ -1,54 +1,45 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Options;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using OrderProcessor.Service.Config;
 using OrderProcessor.Service.Formatting;
 using OrderProcessor.Service.IO;
 using OrderProcessor.Service.Parsing;
 using OrderProcessor.Service.Pricing;
 using OrderProcessor.Service.Processing;
-using OrdProcessor = OrderProcessor.Service.Processing.OrderProcessor;
+using Serilog;
+using System.Globalization;
+using System.Text.Json;
+using Processor = OrderProcessor.Service.Processing.OrderProcessor;
 
-namespace OrderProcessor
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            try
-            {
-                var orderFilePath = args.Length > 0 ? args[0] : "orders.csv";
-                var app = BuildApplicationHost(orderFilePath);
+var builder = WebApplication.CreateBuilder(args);
 
-                var orderProcessor = app.Services.GetRequiredService<IOrderProcessor>();
-                var orders = orderProcessor.ProcessOrders(orderFilePath);
-                var report = orderProcessor.PrintOrdersReport(orders);
-                Console.WriteLine(report);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"An error occurred: {ex.Message}");
-            }
-        }
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
 
-        private static IHost BuildApplicationHost(string orderFilePath)
-        {
-            var applicationBuilder = Host.CreateApplicationBuilder();
+builder.Host.UseSerilog();
 
-            // Add logging
-            applicationBuilder.Services.AddLogging();
+builder.Services.Configure<PricingConfig>(builder.Configuration.GetSection("Pricing"));
+builder.Services.Configure<FallbackConfig>(builder.Configuration.GetSection("Fallback"));
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<IClock, SystemClock>();
+builder.Services.AddSingleton<IOrderParser, NaiveCsvOrderParser>();
+builder.Services.AddSingleton<IPricingEngine, PricingEngine>();
+builder.Services.AddSingleton<IReportFormatter, TableFormatter>();
+builder.Services.AddSingleton<IOrderProcessor, Processor>();
+builder.Services.AddSingleton<ICustomerCache, InMemoryCustomerCache>();
+builder.Services.AddSingleton<ILineSource>(sp =>
+    new FileOrFallbackLineSource("orders.csv", sp.GetRequiredService<IOptions<FallbackConfig>>()));
 
-            // Register IMemoryCache
-            applicationBuilder.Services.AddMemoryCache();
+builder.Services.AddHealthChecks();
+builder.Services.AddProblemDetails();
 
-            // Register other services
-            applicationBuilder.Services.AddScoped<ILineSource>(sp => new FileOrFallbackLineSource(orderFilePath));
-            applicationBuilder.Services.AddScoped<IOrderParser, NaiveCsvOrderParser>();
-            applicationBuilder.Services.AddScoped<IClock, SystemClock>();
-            applicationBuilder.Services.AddScoped<IReportFormatter, TableFormatter>();
-            applicationBuilder.Services.AddScoped<IPricingEngine, PricingEngine>();
-            applicationBuilder.Services.AddScoped<ICustomerCache, InMemoryCustomerCache>();
-            applicationBuilder.Services.AddScoped<IOrderProcessor, OrdProcessor>();
-
-            return applicationBuilder.Build();
-        }
-    }
-}
+var app = builder.Build();
+var config = app.Services.GetRequiredService<IOptions<FallbackConfig>>().Value;
+Console.WriteLine(JsonSerializer.Serialize(config));

@@ -1,19 +1,21 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OrderProcessor.Service.Config;
 using OrderProcessor.Service.Domain;
 
 namespace OrderProcessor.Service.Pricing
 {
-    public class PricingEngine(ILogger<PricingEngine> logger) : IPricingEngine
+    public class PricingEngine(ILogger<PricingEngine> logger, IOptions<PricingConfig> pricingConfigOptions) : IPricingEngine
     {
         private readonly ILogger<PricingEngine> _logger = logger;
+        private readonly PricingConfig _pricingConfig = pricingConfigOptions.Value;
         public double CalculateDiscountOrSurcharge(Order order)
         {
             try
             {
                 return order == null 
                     ? throw new ArgumentNullException(nameof(order)) 
-                    : PricingConfig.GetPriceMultiplier(order.Type);
+                    : _pricingConfig.GetPriceMultiplier(order.Type);
             }
             catch (Exception ex)
             {
@@ -57,7 +59,7 @@ namespace OrderProcessor.Service.Pricing
         {
             try
             {
-                return amount * PricingConfig.GetStateTaxRate(state);
+                return amount * _pricingConfig.GetStateTaxRate(state);
             }
             catch (Exception ex)
             {

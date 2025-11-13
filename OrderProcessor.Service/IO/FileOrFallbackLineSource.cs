@@ -1,10 +1,12 @@
-﻿using OrderProcessor.Service.Config;
+﻿using Microsoft.Extensions.Options;
+using OrderProcessor.Service.Config;
 
 namespace OrderProcessor.Service.IO
 {
-    public class FileOrFallbackLineSource(string filePath) : ILineSource
+    public class FileOrFallbackLineSource(string filePath, IOptions<FallbackConfig> fallbackConfigOptions) : ILineSource
     {
         private readonly string _filePath = filePath;
+        private readonly FallbackConfig _fallbackConfig = fallbackConfigOptions.Value;
 
         public IEnumerable<string> GetLines()
         {
@@ -14,7 +16,7 @@ namespace OrderProcessor.Service.IO
             }
             catch (FileNotFoundException)
             {
-                return PricingConfig.DefaultOrderFallbackLines;
+                return _fallbackConfig.FallbackData;
             }
             catch (Exception ex)
             {
