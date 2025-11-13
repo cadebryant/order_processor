@@ -9,9 +9,13 @@
   <ItemGroup>
     <Folder Include="Domain\" />
     <Folder Include="Formatting\" />
-    <Folder Include="Pricing\" />
     <Folder Include="Processing\" />
     <Folder Include="Parsing\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

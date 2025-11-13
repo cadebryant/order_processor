@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using OrderProcessor.Domain;
-using OrderProcessor.IO;
+using OrderProcessor.Service.Domain;
+using OrderProcessor.Service.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.Parsing
+namespace OrderProcessor.Service.Parsing
 {
     public class NaiveCsvOrderParser(
         ILogger<NaiveCsvOrderParser> logger,

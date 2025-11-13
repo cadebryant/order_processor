@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.Domain
+namespace OrderProcessor.Service.Domain
 {
     public class Customer(string name)
     {

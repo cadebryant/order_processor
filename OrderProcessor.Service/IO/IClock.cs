@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.Domain
+namespace OrderProcessor.Service.IO
 {
-    public interface ICustomerCache
+    public interface IClock
     {
-        public Customer? GetCustomer(string name);
+        DateTime Today();
     }
 }

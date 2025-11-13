@@ -1,16 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using OrderProcessor.Domain;
-using OrderProcessor.Formatting;
-using OrderProcessor.IO;
-using OrderProcessor.Parsing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PricingConfig = OrderProcessor.Config.PricingConfig;
+using OrderProcessor.Service.Domain;
+using OrderProcessor.Service.Formatting;
+using OrderProcessor.Service.IO;
+using OrderProcessor.Service.Parsing;
+using OrderProcessor.Service.Pricing;
 
-namespace OrderProcessor.App
+namespace OrderProcessor.Service.Processing
 {
     public class OrderProcessor(
         IPricingEngine pricingEngine,

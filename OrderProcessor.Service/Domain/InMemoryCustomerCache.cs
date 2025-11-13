@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace OrderProcessor.Domain
+namespace OrderProcessor.Service.Domain
 {
     public class InMemoryCustomerCache(IMemoryCache memoryCache) : ICustomerCache
     {

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using OrderProcessor.Service.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.Domain
+namespace OrderProcessor.Service.Pricing
 {
     public interface IPricingEngine
     {

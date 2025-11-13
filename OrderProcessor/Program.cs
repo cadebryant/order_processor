@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OrderProcessor.App;
-using OrderProcessor.Domain;
-using OrderProcessor.Formatting;
-using OrderProcessor.IO;
-using OrderProcessor.Parsing;
-using OrdProcessor = OrderProcessor.App.OrderProcessor;
+using OrderProcessor.Service.Config;
+using OrderProcessor.Service.Domain;
+using OrderProcessor.Service.Formatting;
+using OrderProcessor.Service.IO;
+using OrderProcessor.Service.Parsing;
+using OrderProcessor.Service.Pricing;
+using OrderProcessor.Service.Processing;
+using OrdProcessor = OrderProcessor.Service.Processing.OrderProcessor;
 
 namespace OrderProcessor
 {

@@ -1,8 +1,8 @@
-﻿using OrderProcessor.Domain;
+﻿using OrderProcessor.Service.Domain;
 using System.Globalization;
 using System.Text;
 
-namespace OrderProcessor.Formatting
+namespace OrderProcessor.Service.Formatting
 {
     public class TableFormatter : IReportFormatter
     {

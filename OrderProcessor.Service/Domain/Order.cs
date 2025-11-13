@@ -1,11 +1,11 @@
-﻿using OrderProcessor.Config;
+﻿using OrderProcessor.Service.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.Domain
+namespace OrderProcessor.Service.Domain
 {
     public class Order(
         int id,

@@ -1,4 +1,6 @@
-﻿namespace OrderProcessor.Domain
+﻿using OrderProcessor.Service.Pricing;
+
+namespace OrderProcessor.Service.Domain
 {
     public class OrdersReport(IEnumerable<Order> orders, IPricingEngine pricingEngine)
     {

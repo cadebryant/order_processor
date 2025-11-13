@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
-using OrderProcessor.Config;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PricingConfig = OrderProcessor.Config.PricingConfig;
+using OrderProcessor.Service.Config;
+using OrderProcessor.Service.Domain;
 
-namespace OrderProcessor.Domain
+namespace OrderProcessor.Service.Pricing
 {
     public class PricingEngine(ILogger<PricingEngine> logger) : IPricingEngine
     {
-        private ILogger<PricingEngine> _logger = logger;
+        private readonly ILogger<PricingEngine> _logger = logger;
         public double CalculateDiscountOrSurcharge(Order order)
         {
             try
