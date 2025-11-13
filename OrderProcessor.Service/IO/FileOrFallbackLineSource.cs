@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using OrderProcessor.Config;
-using PricingConfig = OrderProcessor.Config.PricingConfig;
+﻿using OrderProcessor.Service.Config;
 
-namespace OrderProcessor.IO
+namespace OrderProcessor.Service.IO
 {
     public class FileOrFallbackLineSource(string filePath) : ILineSource
     {

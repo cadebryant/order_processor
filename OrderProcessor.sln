@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36203.30 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderProcessor", "OrderProcessor\OrderProcessor.csproj", "{504DEEEF-56CF-456F-A3F5-806CFD0ABF85}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderProcessorTests", "OrderProcessorTests\OrderProcessorTests.csproj", "{0633EB97-04D5-4BB7-B8D9-E8B90CE0081E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderProcessor.Service", "OrderProcessor.Service\OrderProcessor.Service.csproj", "{BD0A5D5D-2282-400A-99DF-1F35AFF35EDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{0633EB97-04D5-4BB7-B8D9-E8B90CE0081E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0633EB97-04D5-4BB7-B8D9-E8B90CE0081E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0633EB97-04D5-4BB7-B8D9-E8B90CE0081E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD0A5D5D-2282-400A-99DF-1F35AFF35EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD0A5D5D-2282-400A-99DF-1F35AFF35EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD0A5D5D-2282-400A-99DF-1F35AFF35EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD0A5D5D-2282-400A-99DF-1F35AFF35EDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderProcessor.IO
+namespace OrderProcessor.Service.IO
 {
     public interface ILineSource
     {
