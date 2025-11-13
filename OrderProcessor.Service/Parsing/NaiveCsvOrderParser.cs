@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using OrderProcessor.Service.Domain;
 using OrderProcessor.Service.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderProcessor.Service.Parsing
 {

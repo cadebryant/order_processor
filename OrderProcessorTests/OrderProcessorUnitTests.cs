@@ -1,18 +1,14 @@
-﻿using OrderProcessor;
-using OrderProcessor.Config;
-using PricingConfig = OrderProcessor.Config.PricingConfig;
-using OrderProcessor.Parsing;
+﻿using OrderProcessor.Service.Config;
+using OrderProcessor.Service.Parsing;
 using Microsoft.Extensions.Logging;
-using Castle.Core.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Microsoft.Extensions.Logging.Abstractions;
-using NullLogger = Microsoft.Extensions.Logging.Abstractions.NullLogger;
 using NSubstitute;
-using OrderProcessor.IO;
-using OrderProcessor.Domain;
+using OrderProcessor.Service.IO;
+using OrderProcessor.Service.Domain;
 using Microsoft.Extensions.Caching.Memory;
-using OrderProcessor.Formatting;
-using OrdProcessor = OrderProcessor.App.OrderProcessor;
+using OrderProcessor.Service.Formatting;
+using Processor = OrderProcessor.Service.Processing.OrderProcessor;
+using OrderProcessor.Service.Pricing;
 
 namespace OrderProcessorTests
 {
@@ -21,7 +17,7 @@ namespace OrderProcessorTests
     {
         private readonly ILogger<PricingEngine> _pricingEngineLogger = NullLogger<PricingEngine>.Instance;
         private readonly ILogger<NaiveCsvOrderParser> _csvOrderLogger = NullLogger<NaiveCsvOrderParser>.Instance;
-        private readonly ILogger<OrdProcessor> _orderProcesserLogger = NullLogger<OrdProcessor>.Instance;
+        private readonly ILogger<Processor> _orderProcesserLogger = NullLogger<Processor>.Instance;
         private readonly IOrderParser _parser = Substitute.For<IOrderParser>();
         private readonly IClock _clock = Substitute.For<IClock>();
         private readonly ILineSource _lineSource = Substitute.For<ILineSource>();
@@ -70,7 +66,7 @@ namespace OrderProcessorTests
             var pricingEngine = new PricingEngine(_pricingEngineLogger);
             var customerCache = new InMemoryCustomerCache(new MemoryCache(new MemoryCacheOptions()));
             var reportFormatter = new TableFormatter();
-            var orderProcessor = new OrdProcessor(
+            var orderProcessor = new Processor(
                 pricingEngine, customerCache, _parser, _lineSource, reportFormatter, _orderProcesserLogger);
 
             _parser.ParseLine(Arg.Any<string>()).Returns(new Order(
@@ -103,7 +99,7 @@ namespace OrderProcessorTests
                 new Order(1, new Customer("John Doe"), "Food", 100.0, _clock.Today(), "North", "CA")
             };
             var ordersReport = new OrdersReport(orders, pricingEngine);
-            var orderProcessor = new OrderProcessor.App.OrderProcessor(
+            var orderProcessor = new Processor(
                 pricingEngine, customerCache, _parser, new FileOrFallbackLineSource("test_orders.csv"), reportFormatter, _orderProcesserLogger);
 
             // Act

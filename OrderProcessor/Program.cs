@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OrderProcessor.Service.Config;
 using OrderProcessor.Service.Formatting;
 using OrderProcessor.Service.IO;
 using OrderProcessor.Service.Parsing;
