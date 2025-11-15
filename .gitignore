@@ -61,3 +61,4 @@ TestResults/
 secrets.json
 *.pfx
 *.key
+/OrderProcessor/Output/report_bb99888a607e44299d21bcdc29483527.txt

@@ -171,7 +171,7 @@ app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProble
 
     rows.AddRange(formatter.FormatSummary(count, (double)gross, (double)revenue));
     var id = Guid.NewGuid().ToString("n");
-    await sink.WriteAllLinesAsync($"report_{id}.txt", rows, ct);
+    await sink.WriteAllLinesAsync($"Output/report_{id}.txt", rows, ct);
 
     return TypedResults.Ok(new ProcessResponse
     {
@@ -186,7 +186,7 @@ app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProble
 
 app.MapGet("/report/{id}", async Task<IResult> (string id, IReportSink sink, CancellationToken ct) =>
 {
-    var path = $"report_{id}.txt";
+    var path = $"Output/report_{id}.txt";
     if (!await sink.ExistsAsync(path, ct))
         return Results.NotFound();
 
