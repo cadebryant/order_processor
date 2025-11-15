@@ -37,12 +37,13 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddSingleton<IOrderParser, NaiveCsvOrderParser>();
 builder.Services.AddSingleton<IPricingEngine, PricingEngine>();
-builder.Services.AddSingleton<IReportFormatter, TableFormatFormatter>();
+builder.Services.AddSingleton<IReportFormatter, TableReportFormatter>();
 builder.Services.AddSingleton<ICustomerCache, InMemoryCustomerCache>();
 builder.Services.AddSingleton<IReportSink, FileReportSink>();
 builder.Services.AddSingleton<ILineSource>(sp =>
     new FileOrFallbackLineSource("orders.csv", sp.GetRequiredService<IOptions<FallbackConfig>>()));
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+// register validators from the assembly that contains the domain types (where ProcessRequest lives)
+builder.Services.AddValidatorsFromAssemblyContaining<ProcessRequest>();
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -109,13 +110,13 @@ else
 app.MapHealthChecks("/health");
 app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProblem>> (
     HttpRequest req,
-    IValidator<ProcessRequest> validator,
-    IClock clock,
-    IReportSink sink,
-    IOptions<PricingConfig> config,
-    IPricingEngine engine,
+    [FromServices] IValidator<ProcessRequest> validator,
+    [FromServices] IClock clock,
+    [FromServices] IReportSink sink,
+    [FromServices] IOptions<PricingConfig> config,
+    [FromServices] IPricingEngine engine,
     [FromServices] IOrderParser parser,
-    IReportFormatter formatter,
+    [FromServices] IReportFormatter formatter,
     CancellationToken ct) =>
 {
     if (req is null)

@@ -4,6 +4,8 @@
 *.suo
 *.userosscache
 *.sln.docstates
+# Ignore the Output folder and everything under it
+/Output/
 
 # Build results
 [Dd]ebug/
