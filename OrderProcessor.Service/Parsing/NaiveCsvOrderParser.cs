@@ -1,72 +1,43 @@
 ﻿using Microsoft.Extensions.Logging;
 using OrderProcessor.Service.Domain;
 using OrderProcessor.Service.IO;
+using System.Globalization;
 
 namespace OrderProcessor.Service.Parsing
 {
-    public class NaiveCsvOrderParser(
-        ILogger<NaiveCsvOrderParser> logger,
+    public sealed class NaiveCsvOrderParser(
         IClock clock) : IOrderParser
     {
-        private readonly ILogger<NaiveCsvOrderParser> _logger = logger;
         private readonly IClock _clock = clock;
-        public Order ParseLine(string l)
+
+        public bool TryParse(string line, out Order order)
         {
-            try
-            {
-                if (!IsValidCsvLine(l))
-                    throw new ArgumentException("Input line cannot be null or empty.", nameof(l));
+            var parts = line.Split(',');
 
-                var parts = l.Split(',');
-                var customer = new Customer(GetItemOrEmpty(parts, 1));
+            while (parts.Length < 7)
+                parts = [.. parts, .. new[] { "" }];
 
-                return new Order(
-                    id: int.TryParse(GetItemOrEmpty(parts, 0), out var id) ? id : -1,
-                    customer: customer,
-                    type: GetItemOrEmpty(parts, 2),
-                    amount: double.TryParse(GetItemOrEmpty(parts, 3), out var amt) ? amt : 0.0,
-                    date: ParseDate(GetItemOrEmpty(parts, 4)),
-                    region: GetItemOrEmpty(parts, 5),
-                    state: GetItemOrEmpty(parts, 6)
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error parsing line: {Line}", l);
-                throw;
-            }
+            var (id, customer, type, amount, date, region, state)
+                = (parts[0], parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]);
+            if (!decimal.TryParse(amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var amt))
+                amt = 0m;
+            if (!TryParseDate(date, out var dt))
+                dt = _clock.Today();
+            order = new Order(id, customer, type, amt, dt, region, state);
+            return true;
         }
 
-        private DateTime ParseDate(string dateString)
+        private static bool TryParseDate(string s, out DateTime dt)
         {
-            try
+            if (DateTime.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
+                return true;
+            if (DateTime.TryParse(s, out dt))
+                return true;
+            if (long.TryParse(s, out var ticks))
             {
-                if (long.TryParse(dateString, out var ticks))
-                {
-                    return new DateTime(ticks);
-                }
-                if (DateTime.TryParse(dateString, out var parsedDate))
-                {
-                    return parsedDate;
-                }
-                return _clock.Today();
+                try { dt = new DateTime(ticks); return true; } catch { /* fallthrough */ }
             }
-            catch (Exception ex)
-            {
-                throw new FormatException($"Failed to parse date: {dateString}", ex);
-                throw;
-            }
-        }
-
-        private static string GetItemOrEmpty(string[] parts, int index)
-        {
-            return (parts != null && parts.Length > index) ? parts[index] : string.Empty;
-        }
-
-        private static bool IsValidCsvLine(string line)
-        {
-            return !string.IsNullOrWhiteSpace(line) &&
-                   (line.Contains(',') || line.Split(',').Length == 1);
+            return false;
         }
     }
 }

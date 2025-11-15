@@ -1,71 +1,39 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OrderProcessor.Service.Config;
 using OrderProcessor.Service.Domain;
 
+
 namespace OrderProcessor.Service.Pricing
 {
-    public class PricingEngine(ILogger<PricingEngine> logger, IOptions<PricingConfig> pricingConfigOptions) : IPricingEngine
+    public sealed class PricingEngine(IOptions<PricingConfig> options) : IPricingEngine
     {
-        private readonly ILogger<PricingEngine> _logger = logger;
-        private readonly PricingConfig _pricingConfig = pricingConfigOptions.Value;
-        public double CalculateDiscountOrSurcharge(Order order)
-        {
-            try
-            {
-                return order == null 
-                    ? throw new ArgumentNullException(nameof(order)) 
-                    : _pricingConfig.GetPriceMultiplier(order.Type);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating discount or surcharge for order {OrderId}", order?.Id);
-                throw;
-            }
-        }
+        private readonly PricingConfig _config = options.Value;
 
-        public double CalculateGrossPrice(Order order)
-        {
-            try
+        private static readonly Dictionary<string, Func<PricingConfig, decimal>> TypeMultipliers
+            = new(StringComparer.OrdinalIgnoreCase)
             {
-                return order == null
-                    ? throw new ArgumentNullException(nameof(order))
-                    : order.Amount;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating gross price for order {OrderId}", order?.Id);
-                throw;
-            }
-        }
+                [OrderConstants.Types.Food] = c => c.FoodMultiplier,
+                [OrderConstants.Types.Electronics] = c => c.ElectronicsMultiplier
+            };
 
-        public double CalculateNetPrice(Order order)
-        {
-            try
+        private static readonly Dictionary<string, Func<PricingConfig, decimal>> StateTaxes
+            = new(StringComparer.OrdinalIgnoreCase)
             {
-                return order == null
-                    ? throw new ArgumentNullException(nameof(order))
-                    : (order.Amount * CalculateDiscountOrSurcharge(order)) 
-                        + CalculateTaxAmount(order.Id, order.State, order.Amount * CalculateDiscountOrSurcharge(order));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating net price for order {OrderId}", order?.Id);
-                throw;
-            }
-        }
+                [OrderConstants.State.NY] = c => c.NyTax,
+                [OrderConstants.State.CA] = c => c.CaTax
+            };
 
-        public double CalculateTaxAmount(int id, string state, double amount)
+        public PricingResult Price(Order order)
         {
-            try
-            {
-                return amount * _pricingConfig.GetStateTaxRate(state);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating tax amount for order {id}", id);
-                throw;
-            }
+            var multiplier = _config.GetPriceMultiplier(order.Type);
+            var interim = order.Amount * (decimal)multiplier;
+
+            var taxRate = _config.GetStateTaxRate(order.State);
+            var net = interim + interim * (decimal)taxRate;
+            return new PricingResult(decimal.Round(net, 2), decimal.Round(taxRate, 2));
         }
     }
 }

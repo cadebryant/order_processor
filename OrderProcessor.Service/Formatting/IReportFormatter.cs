@@ -4,6 +4,8 @@ namespace OrderProcessor.Service.Formatting
 {
     public interface IReportFormatter
     {
-        string FormatReport(OrdersReport reportData);
+        string Header { get; }
+        string FormatRow(Order order, PricingResult pricingResult);
+        IEnumerable<string> FormatSummary(int count, double gross, double revenue);
     }
 }

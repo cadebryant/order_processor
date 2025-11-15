@@ -4,6 +4,6 @@ namespace OrderProcessor.Service.Parsing
 {
     public interface IOrderParser
     {
-        Order ParseLine(string l);
+        bool TryParse(string line, out Order order);
     }
 }

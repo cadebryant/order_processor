@@ -7,9 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\" />
-    <Folder Include="Formatting\" />
-    <Folder Include="Processing\" />
     <Folder Include="Parsing\" />
   </ItemGroup>
 

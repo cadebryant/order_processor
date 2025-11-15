@@ -7,7 +7,6 @@ using OrderProcessor.Service.IO;
 using OrderProcessor.Service.Domain;
 using Microsoft.Extensions.Caching.Memory;
 using OrderProcessor.Service.Formatting;
-using Processor = OrderProcessor.Service.Processing.OrderProcessor;
 using OrderProcessor.Service.Pricing;
 
 namespace OrderProcessorTests
@@ -17,7 +16,6 @@ namespace OrderProcessorTests
     {
         private readonly ILogger<PricingEngine> _pricingEngineLogger = NullLogger<PricingEngine>.Instance;
         private readonly ILogger<NaiveCsvOrderParser> _csvOrderLogger = NullLogger<NaiveCsvOrderParser>.Instance;
-        private readonly ILogger<Processor> _orderProcesserLogger = NullLogger<Processor>.Instance;
         private readonly IOrderParser _parser = Substitute.For<IOrderParser>();
         private readonly IClock _clock = Substitute.For<IClock>();
         private readonly ILineSource _lineSource = Substitute.For<ILineSource>();
@@ -114,19 +112,20 @@ namespace OrderProcessorTests
         public void NaiveCsvOrderParser_ParseLine_ParsesValidLineCorrectly()
         {
             // Arrange
-            var parser = new NaiveCsvOrderParser(_csvOrderLogger, _clock);
+            var parser = new NaiveCsvOrderParser(_clock);
             var line = "1,John Doe,Food,100.0,2025-11-10,North,CA";
             _clock.Today().Returns(new DateTime(2025, 11, 10));
 
             // Act
-            var order = parser.ParseLine(line);
+            //var order = parser.ParseLine(line);
+            parser.TryParse(line, out var order);
 
             // Assert
             Assert.IsNotNull(order);
-            Assert.AreEqual(1, order.Id);
-            Assert.AreEqual("John Doe", order.Customer.Name);
+            Assert.AreEqual("1", order.Id);
+            Assert.AreEqual("John Doe", order.Customer);
             Assert.AreEqual("Food", order.Type);
-            Assert.AreEqual(100.0, order.Amount);
+            Assert.AreEqual(100.0m, order.Amount);
             Assert.AreEqual(new DateTime(2025, 11, 10), order.Date);
             Assert.AreEqual("North", order.Region);
             Assert.AreEqual("CA", order.State);
@@ -136,12 +135,12 @@ namespace OrderProcessorTests
         public void NaiveCsvOrderParser_ParseLine_FailsOnInvalidLine()
         {
             // Arrange
-            var parser = new NaiveCsvOrderParser(_csvOrderLogger, _clock);
+            var parser = new NaiveCsvOrderParser(_clock);
             var line = "";
             _clock.Today().Returns(new DateTime(2025, 11, 10));
 
             // Act & Assert
-            Assert.Throws<Exception>(() => parser.ParseLine(line));
+            Assert.IsFalse(parser.TryParse(line, out var _));
         }
     }
 }
