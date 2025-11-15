@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using OrderProcessor.Service.Config;
@@ -15,6 +17,7 @@ using OrderProcessor.Service.Pricing;
 using OrderProcessor.Service.Sinks;
 using Serilog;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,9 +39,30 @@ builder.Services.AddSingleton<IOrderParser, NaiveCsvOrderParser>();
 builder.Services.AddSingleton<IPricingEngine, PricingEngine>();
 builder.Services.AddSingleton<IReportFormatter, TableFormatFormatter>();
 builder.Services.AddSingleton<ICustomerCache, InMemoryCustomerCache>();
+builder.Services.AddSingleton<IReportSink, FileReportSink>();
 builder.Services.AddSingleton<ILineSource>(sp =>
     new FileOrFallbackLineSource("orders.csv", sp.GetRequiredService<IOptions<FallbackConfig>>()));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// Swagger / OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "OrderProcessor API",
+        Version = "v1",
+        Description = "Minimal API for processing orders and retrieving reports"
+    });
+
+    // include XML comments if the XML file is generated
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
 
 builder.Services.AddHealthChecks();
 builder.Services.AddOpenTelemetry()
@@ -66,6 +90,22 @@ app.UseExceptionHandler(e =>
     });
 });
 
+// enable Swagger UI
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OrderProcessor API v1"));
+}
+else
+{
+    // optional: expose swagger in non-dev too (adjust as desired)
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "OrderProcessor API v1");
+    });
+}
+
 app.MapHealthChecks("/health");
 app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProblem>> (
     HttpRequest req,
@@ -74,7 +114,7 @@ app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProble
     IReportSink sink,
     IOptions<PricingConfig> config,
     IPricingEngine engine,
-    IOrderParser parser,
+    [FromServices] IOrderParser parser,
     IReportFormatter formatter,
     CancellationToken ct) =>
 {
