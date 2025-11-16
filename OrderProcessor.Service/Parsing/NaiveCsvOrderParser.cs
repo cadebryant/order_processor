@@ -12,6 +12,11 @@ namespace OrderProcessor.Service.Parsing
 
         public bool TryParse(string line, out Order order)
         {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                order = default!;
+                return false;
+            }
             var parts = line.Split(',');
 
             while (parts.Length < 7)
