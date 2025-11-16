@@ -17,24 +17,46 @@ using System.Threading.Tasks;
 
 namespace OrderProcessor.Service.Processing
 {
-    public class FileBasedOrderProcessor(
-        IValidator<ProcessRequest> validator,
-        IClock clock,
-        IReportSink sink,
-        IOptions<PricingConfig> config,
-        IPricingEngine engine,
-        IOrderParser parser,
-        IReportFormatter formatter,
-        Serilog.ILogger logger) : IOrderProcessor
+    public class FileBasedOrderProcessor : IOrderProcessor
     {
-        private readonly IValidator<ProcessRequest> _validator = validator;
-        private readonly IClock _clock = clock;
-        private readonly IReportSink _sink = sink;
-        private readonly PricingConfig _config = config.Value;
-        private readonly IPricingEngine _engine = engine;
-        private readonly IOrderParser _parser = parser;
-        private readonly IReportFormatter _formatter = formatter;
-        private readonly Serilog.ILogger _logger = logger;
+        private readonly IValidator<ProcessRequest> _validator;
+        private readonly IClock _clock;
+        private readonly IReportSink _sink;
+        private readonly PricingConfig _config;
+        private readonly IPricingEngine _engine;
+        private readonly IOrderParser _parser;
+        private readonly IReportFormatter _formatter;
+        private readonly Serilog.ILogger _logger;
+
+        public FileBasedOrderProcessor(
+            IValidator<ProcessRequest> validator,
+            IClock clock,
+            IReportSink sink,
+            IOptions<PricingConfig> config,
+            IPricingEngine engine,
+            IOrderParser parser,
+            IReportFormatter formatter,
+            Serilog.ILogger logger)
+        {
+            _validator = validator;
+            _clock = clock;
+            _sink = sink;
+            _config = config.Value;
+            _engine = engine;
+            _parser = parser;
+            _formatter = formatter;
+            _logger = logger;
+        }
+
+        public async Task<IResult> GetOrderReportAsync(string id, CancellationToken ct)
+        {
+            var path = $"Output/report_{id}.txt";
+            if (!await _sink.ExistsAsync(path, ct))
+                return Results.NotFound();
+
+            var lines = await _sink.ReadAllLinesAsync(path, ct);
+            return Results.Text(string.Join(Environment.NewLine, lines), "text/plain");
+        }
 
         public async Task<Results<Ok<ProcessResponse>, ValidationProblem>> ProcessOrdersAsync(HttpRequest processOrdersRequest, CancellationToken ct)
         {

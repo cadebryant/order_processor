@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
@@ -17,9 +16,7 @@ using OrderProcessor.Service.Pricing;
 using OrderProcessor.Service.Processing;
 using OrderProcessor.Service.Sinks;
 using Serilog;
-using System.Globalization;
 using System.Reflection;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,14 +122,9 @@ app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProble
 .Produces<ProcessResponse>(StatusCodes.Status200OK)
 .ProducesProblem(StatusCodes.Status400BadRequest);
 
-app.MapGet("/report/{id}", async Task<IResult> (string id, IReportSink sink, CancellationToken ct) =>
-{
-    var path = $"Output/report_{id}.txt";
-    if (!await sink.ExistsAsync(path, ct))
-        return Results.NotFound();
-
-    var lines = await sink.ReadAllLinesAsync(path, ct);
-    return Results.Text(string.Join(Environment.NewLine, lines), "text/plain");
-});
+app.MapGet("/report/{id}", async Task<IResult>(
+    string id,
+    [FromServices] IOrderProcessor processor,
+    CancellationToken ct) => await processor.GetOrderReportAsync(id, ct));
 
 app.Run();
