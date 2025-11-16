@@ -9,11 +9,6 @@ using OrderProcessor.Service.IO;
 using OrderProcessor.Service.Parsing;
 using OrderProcessor.Service.Pricing;
 using OrderProcessor.Service.Sinks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OrderProcessor.Service.Processing
 {
