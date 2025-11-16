@@ -4,8 +4,8 @@
 *.suo
 *.userosscache
 *.sln.docstates
-/OrderProcessor/OrderProcessor/Output/*
-!/OrderProcessor/OrderProcessor/Output/.gitkeep
+**/Output/*
+!**/Output/.gitkeep
 
 # Build results
 [Dd]ebug/
