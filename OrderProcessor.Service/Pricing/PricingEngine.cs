@@ -12,20 +12,6 @@ namespace OrderProcessor.Service.Pricing
     {
         private readonly PricingConfig _config = options.Value;
 
-        private static readonly Dictionary<string, Func<PricingConfig, decimal>> TypeMultipliers
-            = new(StringComparer.OrdinalIgnoreCase)
-            {
-                [OrderConstants.Types.Food] = c => c.FoodMultiplier,
-                [OrderConstants.Types.Electronics] = c => c.ElectronicsMultiplier
-            };
-
-        private static readonly Dictionary<string, Func<PricingConfig, decimal>> StateTaxes
-            = new(StringComparer.OrdinalIgnoreCase)
-            {
-                [OrderConstants.State.NY] = c => c.NyTax,
-                [OrderConstants.State.CA] = c => c.CaTax
-            };
-
         public PricingResult Price(Order order)
         {
             var multiplier = _config.GetPriceMultiplier(order.Type);
