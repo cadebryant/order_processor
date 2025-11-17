@@ -13,7 +13,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Restore
-        run: dotnet restore ./src/OrderProcessor.Service/OrderProcessor.Service.csproj
+        run: dotnet restore ./OrderProcessor.Service/OrderProcessor.Service.csproj
       - name: Build
         run: dotnet build --no-restore -c Release ./src/OrderProcessor.Service/OrderProcessor.Service.csproj
       - name: Test
