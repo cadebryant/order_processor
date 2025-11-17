@@ -113,6 +113,7 @@ else
 }
 
 app.MapHealthChecks("/health");
+app.MapGet("/health", () => Results.Ok("OK"));
 
 app.MapPost("/process", async Task<Results<Ok<ProcessResponse>, ValidationProblem>> (
     HttpRequest processOrdersRequest,
