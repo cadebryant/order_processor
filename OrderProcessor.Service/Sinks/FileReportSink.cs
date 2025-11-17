@@ -12,7 +12,7 @@ namespace OrderProcessor.Service.Sinks
             => await Task.FromResult(File.Exists(path));
 
         public async Task<string[]> ReadAllLinesAsync(string path, CancellationToken ct) 
-            => await File.ReadAllLinesAsync(path);
+            => await File.ReadAllLinesAsync(path, ct);
 
         public async Task WriteAllLinesAsync(string path, IEnumerable<string> lines, CancellationToken ct)
         {
