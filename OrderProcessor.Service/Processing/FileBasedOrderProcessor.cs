@@ -110,16 +110,19 @@ namespace OrderProcessor.Service.Processing
 
             rows.AddRange(_formatter.FormatSummary(count, (double)gross, (double)revenue));
             var id = Guid.NewGuid().ToString("n");
+            var path = Path.Combine("Output", $"report_{id}.txt");
             await _sink.WriteAllLinesAsync($"Output/report_{id}.txt", rows, ct);
 
+            var reportText = string.Join(Environment.NewLine, rows);
+            var response = new ProcessResponse(id, reportText)
+            {
+                Orders = count,
+                Gross = gross,
+                Revenue = revenue
+            };
             _logger.Information("Finished processing request; wrote report {ReportId}", id);
 
-            return TypedResults.Ok(new ProcessResponse
-            {
-                TotalOrders = count,
-                Gross = Math.Round(gross, 2),
-                Revenue = Math.Round(revenue, 2)
-            });
+            return TypedResults.Ok(response);
         }
     }
 }
