@@ -15,6 +15,6 @@ jobs:
       - name: Restore
         run: dotnet restore ./OrderProcessor.Service/OrderProcessor.Service.csproj
       - name: Build
-        run: dotnet build --no-restore -c Release ./src/OrderProcessor.Service/OrderProcessor.Service.csproj
+        run: dotnet build --no-restore -c Release ./OrderProcessor.Service/OrderProcessor.Service.csproj
       - name: Test
         run: dotnet test --no-build -c Release
